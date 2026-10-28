@@ -1,0 +1,235 @@
+:root {
+  --bg-1: #0f172a;
+  --bg-2: #111827;
+  --panel: rgba(15, 23, 42, 0.82);
+  --panel-border: rgba(148, 163, 184, 0.2);
+  --board-bg: #1d4ed8;
+  --board-hole: #93c5fd;
+  --human: #ef4444;
+  --ai: #facc15;
+  --cell: #dbeafe;
+  --text: #e2e8f0;
+  --muted: #cbd5e1;
+  --shadow: rgba(15, 23, 42, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  font-family: Arial, Helvetica, sans-serif;
+  background: radial-gradient(circle at top, #1e293b, var(--bg-1) 42%, var(--bg-2));
+  color: var(--text);
+}
+
+button,
+select {
+  font: inherit;
+}
+
+.app {
+  width: min(92vw, 900px);
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px var(--shadow);
+  padding: 24px;
+}
+
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.primary-btn {
+  border: none;
+  background: linear-gradient(135deg, #38bdf8, #2563eb);
+  color: white;
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.primary-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.status-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+}
+
+.label {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+#turn-indicator {
+  font-size: 1.15rem;
+}
+
+select {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 10px;
+  padding: 0.65rem 0.8rem;
+  color: var(--text);
+}
+
+.scoreboard {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(110px, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.score-card {
+  border-radius: 16px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.score-card span {
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+.score-card strong {
+  font-size: clamp(1.3rem, 3vw, 2rem);
+}
+
+.score-card.human {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.score-card.ai {
+  background: rgba(250, 204, 21, 0.12);
+}
+
+.score-card.draw {
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.board-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(54px, 1fr));
+  gap: 10px;
+  background: var(--board-bg);
+  padding: 16px;
+  border-radius: 18px;
+  width: min(100%, 620px);
+  box-shadow: inset 0 10px 20px rgba(30, 64, 175, 0.35);
+}
+
+.cell {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--cell);
+  border: 2px solid rgba(15, 23, 42, 0.05);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cell:hover:not(.locked) {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.cell:before {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.cell.player-1 {
+  background: var(--human);
+}
+
+.cell.player-2 {
+  background: var(--ai);
+}
+
+.cell.player-1:before,
+.cell.player-2:before {
+  box-shadow: inset -8px -6px 12px rgba(0, 0, 0, 0.18);
+}
+
+.cell.locked {
+  cursor: default;
+}
+
+@media (max-width: 620px) {
+  .panel {
+    padding: 18px 14px;
+  }
+
+  .title-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .scoreboard {
+    grid-template-columns: repeat(3, minmax(80px, 1fr));
+    gap: 10px;
+  }
+
+  .board {
+    gap: 8px;
+    padding: 12px;
+  }
+}

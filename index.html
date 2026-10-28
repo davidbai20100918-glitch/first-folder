@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connect 4 vs AI</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="panel">
+        <div class="title-row">
+          <div>
+            <p class="eyebrow">Arcade game</p>
+            <h1>Connect 4</h1>
+          </div>
+          <button id="new-game" class="primary-btn">New Game</button>
+        </div>
+
+        <div class="status-bar">
+          <div class="status-item">
+            <span class="label">Turn</span>
+            <strong id="turn-indicator">Your turn</strong>
+          </div>
+          <div class="status-item">
+            <span class="label">Difficulty</span>
+            <select id="difficulty">
+              <option value="easy">Easy</option>
+              <option value="medium" selected>Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="scoreboard">
+          <div class="score-card human">
+            <span>Player</span>
+            <strong id="player-score">0</strong>
+          </div>
+          <div class="score-card draw">
+            <span>Draws</span>
+            <strong id="draw-score">0</strong>
+          </div>
+          <div class="score-card ai">
+            <span>AI</span>
+            <strong id="ai-score">0</strong>
+          </div>
+        </div>
+
+        <div class="board-wrap">
+          <div id="board" class="board" aria-label="Connect 4 board"></div>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
