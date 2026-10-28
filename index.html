@@ -3,27 +3,38 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Play Connect 4 against an AI opponent on easy, medium, or hard difficulty."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23ef4444'/%3E%3C/svg%3E"
+    />
     <title>Connect 4 vs AI</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="app">
-      <section class="panel">
-        <div class="title-row">
+      <section class="panel" aria-labelledby="app-title">
+        <header class="title-row">
           <div>
             <p class="eyebrow">Arcade game</p>
-            <h1>Connect 4</h1>
+            <h1 id="app-title">Connect 4</h1>
           </div>
-          <button id="new-game" class="primary-btn">New Game</button>
-        </div>
+          <button id="new-game" class="primary-btn" type="button">
+            New Game
+          </button>
+        </header>
 
         <div class="status-bar">
           <div class="status-item">
             <span class="label">Turn</span>
-            <strong id="turn-indicator">Your turn</strong>
+            <strong id="turn-indicator" aria-live="polite">Ready to play</strong>
           </div>
-          <div class="status-item">
-            <span class="label">Difficulty</span>
+
+          <div class="status-item status-item--difficulty">
+            <label class="label" for="difficulty">Difficulty</label>
             <select id="difficulty">
               <option value="easy">Easy</option>
               <option value="medium" selected>Medium</option>
@@ -32,27 +43,74 @@
           </div>
         </div>
 
-        <div class="scoreboard">
-          <div class="score-card human">
-            <span>Player</span>
-            <strong id="player-score">0</strong>
+        <!-- 开始界面：选择难度后，点击 New Game 或 Start Playing 进入棋盘。 -->
+        <section
+          id="start-screen"
+          class="screen start-screen"
+          aria-labelledby="start-title"
+        >
+          <div class="start-copy">
+            <p class="eyebrow eyebrow--accent">You vs. AI</p>
+            <h2 id="start-title">Four in a row wins.</h2>
+            <p class="intro">
+              Pick a difficulty, then drop your red discs into the grid. Connect
+              four in a row &mdash; horizontally, vertically, or diagonally
+              &mdash; before the AI does.
+            </p>
+            <p id="difficulty-note" class="difficulty-note">
+              Medium &mdash; a balanced opponent that blocks your obvious
+              threats.
+            </p>
+            <div class="start-actions">
+              <button
+                id="start-game"
+                class="primary-btn primary-btn--large"
+                type="button"
+              >
+                Start Playing
+              </button>
+              <span class="hint">You play red. The AI plays yellow.</span>
+            </div>
           </div>
-          <div class="score-card draw">
-            <span>Draws</span>
-            <strong id="draw-score">0</strong>
-          </div>
-          <div class="score-card ai">
-            <span>AI</span>
-            <strong id="ai-score">0</strong>
-          </div>
-        </div>
 
-        <div class="board-wrap">
-          <div id="board" class="board" aria-label="Connect 4 board"></div>
-        </div>
+          <div class="start-visual" aria-hidden="true">
+            <div class="mini-board">
+              <span></span><span></span><span></span><span class="mini-red"></span>
+              <span></span><span></span><span class="mini-yellow"></span><span></span>
+              <span></span><span class="mini-red"></span><span></span><span></span>
+              <span class="mini-red"></span><span></span><span></span><span></span>
+            </div>
+            <p class="mini-caption">Connect four.<br />Any direction.</p>
+          </div>
+        </section>
+
+        <!-- 游戏界面：棋盘由 script.js 生成。 -->
+        <section
+          id="game-screen"
+          class="screen game-screen"
+          aria-label="Connect 4 game"
+          hidden
+        >
+          <div class="legend" aria-hidden="true">
+            <span class="legend-item">
+              <span class="disc-dot disc-dot--red"></span>You
+            </span>
+            <span class="legend-item">
+              <span class="disc-dot disc-dot--yellow"></span>AI
+            </span>
+          </div>
+
+          <div class="board-wrap">
+            <div id="board" class="board" aria-label="Connect 4 board"></div>
+          </div>
+
+          <p id="board-hint" class="board-hint">
+            Choose a column to drop your disc. First to connect four wins.
+          </p>
+        </section>
       </section>
     </main>
 
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
   </body>
 </html>

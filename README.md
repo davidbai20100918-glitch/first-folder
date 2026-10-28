@@ -1,502 +1,63 @@
-const ROWS = 6;
-const COLS = 7;
-const EMPTY = 0;
-const HUMAN = 1;
-const AI = 2;
-
-let board = [];
-let currentTurn = HUMAN;
-let scores = { player: 0, ai: 0, draws: 0 };
-let difficulty = 'medium';
-let gameOver = false;
-
-const boardEl = document.getElementById('board');
-const turnIndicator = document.getElementById('turn-indicator');
-const playerScoreEl = document.getElementById('player-score');
-const aiScoreEl = document.getElementById('ai-score');
-const drawScoreEl = document.getElementById('draw-score');
-const newGameBtn = document.getElementById('new-game');
-const difficultySelect = document.getElementById('difficulty');
-
-function initializeBoard() {
-  board = Array.from({ length: ROWS }, () => Array(COLS).fill(EMPTY));
-  currentTurn = HUMAN;
-  gameOver = false;
-  renderBoard();
-  updateStatus();
-  updateScores();
-}
-
-function updateScores() {
-  playerScoreEl.textContent = scores.player;
-  aiScoreEl.textContent = scores.ai;
-  drawScoreEl.textContent = scores.draws;
-}
-
-function updateStatus() {
-  if (gameOver) {
-    turnIndicator.textContent = 'Game over';
-    return;
-  }
-
-  turnIndicator.textContent = currentTurn === HUMAN ? 'Your turn' : 'AI thinking...';
-}
-
-function renderBoard() {
-  boardEl.innerHTML = '';
-
-  for (let row = 0; row < ROWS; row++) {
-    for (let col = 0; col < COLS; col++) {
-      const cell = document.createElement('button');
-      cell.type = 'button';
-      cell.className = 'cell';
-      cell.dataset.row = String(row);
-      cell.dataset.col = String(col);
-      cell.setAttribute('aria-label', `Row ${row + 1}, column ${col + 1}`);
-      cell.classList.toggle('locked', board[row][col] !== EMPTY);
-
-      if (board[row][col] === HUMAN) {
-        cell.classList.add('player-1');
-      } else if (board[row][col] === AI) {
-        cell.classList.add('player-2');
-      }
-
-      cell.addEventListener('click', () => handleHumanMove(col));
-      boardEl.appendChild(cell);
-    }
-  }
-}
-
-function isColumnPlayable(col) {
-  return board[0][col] === EMPTY;
-}
-
-function dropDisc(col, player) {
-  for (let row = ROWS - 1; row >= 0; row--) {
-    if (board[row][col] === EMPTY) {
-      board[row][col] = player;
-      return { row, col };
-    }
-  }
-  return null;
-}
-
-function getWinner() {
-  const directions = [
-    [0, 1],
-    [1, 0],
-    [1, 1],
-    [1, -1],
-  ];
-
-  for (let row = 0; row < ROWS; row++) {
-    for (let col = 0; col < COLS; col++) {
-      const current = board[row][col];
-      if (current === EMPTY) continue;
-
-      for (const [dr, dc] of directions) {
-        let count = 1;
-
-        for (let step = 1; step < 4; step++) {
-          const nextRow = row + dr * step;
-          const nextCol = col + dc * step;
-
-          if (
-            nextRow >= 0 &&
-            nextRow < ROWS &&
-            nextCol >= 0 &&
-            nextCol < COLS &&
-            board[nextRow][nextCol] === current
-          ) {
-            count += 1;
-          } else {
-            break;
-          }
-        }
-
-        if (count >= 4) {
-          return current;
-        }
-      }
-    }
-  }
-
-  return null;
-}
-
-function isBoardFull() {
-  return board.every((row) => row.every((cell) => cell !== EMPTY));
-}
-
-function endGame(winner) {
-  gameOver = true;
-
-  if (winner === HUMAN) {
-    scores.player += 1;
-    turnIndicator.textContent = 'You win!';
-  } else if (winner === AI) {
-    scores.ai += 1;
-    turnIndicator.textContent = 'AI wins!';
-  } else {
-    scores.draws += 1;
-    turnIndicator.textContent = 'Draw game';
-  }
-
-  updateScores();
-  renderBoard();
-}
-
-function handleHumanMove(col) {
-  if (gameOver || currentTurn !== HUMAN || !isColumnPlayable(col)) {
-    return;
-  }
-
-  const move = dropDisc(col, HUMAN);
-  if (!move) return;
-
-  renderBoard();
-
-  const winner = getWinner();
-  if (winner) {
-    endGame(winner);
-    return;
-  }
-
-  if (isBoardFull()) {
-    endGame(null);
-    return;
-  }
-
-  currentTurn = AI;
-  updateStatus();
-  renderBoard();
-
-  setTimeout(() => {
-    makeAiMove();
-  }, 300);
-}
-
-function getImmediateWinningMove(player) {
-  for (let col = 0; col < COLS; col++) {
-    if (!isColumnPlayable(col)) continue;
-
-    const tempBoard = copyBoard(board);
-    const row = dropDiscToBoard(tempBoard, col, player);
-    if (!row) continue;
-
-    if (hasConnectFour(tempBoard, player)) {
-      return col;
-    }
-  }
-
-  return null;
-}
-
-function copyBoard(currentBoard) {
-  return currentBoard.map((row) => [...row]);
-}
-
-function dropDiscToBoard(targetBoard, col, player) {
-  for (let row = ROWS - 1; row >= 0; row--) {
-    if (targetBoard[row][col] === EMPTY) {
-      targetBoard[row][col] = player;
-      return row;
-    }
-  }
-  return null;
-}
-
-function hasConnectFour(targetBoard, player) {
-  const directions = [
-    [0, 1],
-    [1, 0],
-    [1, 1],
-    [1, -1],
-  ];
-
-  for (let row = 0; row < ROWS; row++) {
-    for (let col = 0; col < COLS; col++) {
-      if (targetBoard[row][col] !== player) continue;
-
-      for (const [dr, dc] of directions) {
-        let count = 1;
-        for (let step = 1; step < 4; step++) {
-          const nextRow = row + dr * step;
-          const nextCol = col + dc * step;
-          if (
-            nextRow >= 0 &&
-            nextRow < ROWS &&
-            nextCol >= 0 &&
-            nextCol < COLS &&
-            targetBoard[nextRow][nextCol] === player
-          ) {
-            count += 1;
-          } else {
-            break;
-          }
-        }
-
-        if (count >= 4) return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-function evaluateWindow(windowValues, player) {
-  const opponent = player === HUMAN ? AI : HUMAN;
-  let score = 0;
-
-  if (windowValues.filter((value) => value === player).length === 4) {
-    score += 100000;
-  } else if (
-    windowValues.filter((value) => value === player).length === 3 &&
-    windowValues.filter((value) => value === EMPTY).length === 1
-  ) {
-    score += 120;
-  } else if (
-    windowValues.filter((value) => value === player).length === 2 &&
-    windowValues.filter((value) => value === EMPTY).length === 2
-  ) {
-    score += 12;
-  }
-
-  if (
-    windowValues.filter((value) => value === opponent).length === 3 &&
-    windowValues.filter((value) => value === EMPTY).length === 1
-  ) {
-    score -= 140;
-  }
-
-  return score;
-}
-
-function scorePosition(boardState, player) {
-  let score = 0;
-
-  const centerArray = boardState.map((row) => row[COLS / 2 | 0]);
-  score += centerArray.filter((cell) => cell === player).length * 6;
-
-  for (let row = 0; row < ROWS; row++) {
-    for (let col = 0; col < COLS - 3; col++) {
-      const window = [
-        boardState[row][col],
-        boardState[row][col + 1],
-        boardState[row][col + 2],
-        boardState[row][col + 3],
-      ];
-      score += evaluateWindow(window, player);
-    }
-  }
-
-  for (let row = 0; row < ROWS - 3; row++) {
-    for (let col = 0; col < COLS; col++) {
-      const window = [
-        boardState[row][col],
-        boardState[row + 1][col],
-        boardState[row + 2][col],
-        boardState[row + 3][col],
-      ];
-      score += evaluateWindow(window, player);
-    }
-  }
-
-  for (let row = 0; row < ROWS - 3; row++) {
-    for (let col = 0; col < COLS - 3; col++) {
-      const window = [
-        boardState[row][col],
-        boardState[row + 1][col + 1],
-        boardState[row + 2][col + 2],
-        boardState[row + 3][col + 3],
-      ];
-      score += evaluateWindow(window, player);
-    }
-  }
-
-  for (let row = 3; row < ROWS; row++) {
-    for (let col = 0; col < COLS - 3; col++) {
-      const window = [
-        boardState[row][col],
-        boardState[row - 1][col + 1],
-        boardState[row - 2][col + 2],
-        boardState[row - 3][col + 3],
-      ];
-      score += evaluateWindow(window, player);
-    }
-  }
-
-  return score;
-}
-
-function minimax(boardState, depth, alpha, beta, maximizingPlayer) {
-  const winner = getWinnerFromBoard(boardState);
-
-  if (winner === AI) return 100000 + depth;
-  if (winner === HUMAN) return -100000 - depth;
-  if (isBoardFullForState(boardState)) return 0;
-  if (depth === 0) return scorePosition(boardState, AI) - scorePosition(boardState, HUMAN);
-
-  if (maximizingPlayer) {
-    let maxEval = -Infinity;
-    for (let col = 0; col < COLS; col++) {
-      if (!isColumnPlayableInState(boardState, col)) continue;
-
-      const tempBoard = copyBoard(boardState);
-      dropDiscToBoard(tempBoard, col, AI);
-      const evaluation = minimax(tempBoard, depth - 1, alpha, beta, false);
-      maxEval = Math.max(maxEval, evaluation);
-      alpha = Math.max(alpha, evaluation);
-      if (beta <= alpha) break;
-    }
-    return maxEval;
-  }
-
-  let minEval = Infinity;
-  for (let col = 0; col < COLS; col++) {
-    if (!isColumnPlayableInState(boardState, col)) continue;
-
-    const tempBoard = copyBoard(boardState);
-    dropDiscToBoard(tempBoard, col, HUMAN);
-    const evaluation = minimax(tempBoard, depth - 1, alpha, beta, true);
-    minEval = Math.min(minEval, evaluation);
-    beta = Math.min(beta, evaluation);
-    if (beta <= alpha) break;
-  }
-  return minEval;
-}
-
-function getWinnerFromBoard(boardState) {
-  const directions = [
-    [0, 1],
-    [1, 0],
-    [1, 1],
-    [1, -1],
-  ];
-
-  for (let row = 0; row < ROWS; row++) {
-    for (let col = 0; col < COLS; col++) {
-      const current = boardState[row][col];
-      if (current === EMPTY) continue;
-
-      for (const [dr, dc] of directions) {
-        let count = 1;
-        for (let step = 1; step < 4; step++) {
-          const nextRow = row + dr * step;
-          const nextCol = col + dc * step;
-
-          if (
-            nextRow >= 0 &&
-            nextRow < ROWS &&
-            nextCol >= 0 &&
-            nextCol < COLS &&
-            boardState[nextRow][nextCol] === current
-          ) {
-            count += 1;
-          } else {
-            break;
-          }
-        }
-
-        if (count >= 4) return current;
-      }
-    }
-  }
-
-  return null;
-}
-
-function isBoardFullForState(boardState) {
-  return boardState.every((row) => row.every((cell) => cell !== EMPTY));
-}
-
-function isColumnPlayableInState(boardState, col) {
-  return boardState[0][col] === EMPTY;
-}
-
-function chooseAiColumn() {
-  const immediateHumanWin = getImmediateWinningMove(HUMAN);
-  if (immediateHumanWin !== null) {
-    const humanCanWinNext = getImmediateWinningMove(HUMAN);
-    if (humanCanWinNext !== null) {
-      return humanCanWinNext;
-    }
-  }
-
-  const aiWinningMove = getImmediateWinningMove(AI);
-  if (aiWinningMove !== null) {
-    return aiWinningMove;
-  }
-
-  const blockMove = getImmediateWinningMove(HUMAN);
-  if (blockMove !== null) {
-    return blockMove;
-  }
-
-  const preferredCols = difficulty === 'easy'
-    ? [3, 2, 4, 1, 5, 0, 6]
-    : difficulty === 'medium'
-      ? [3, 2, 4, 1, 5, 0, 6]
-      : [3, 2, 4, 1, 5, 0, 6];
-
-  const moves = [];
-
-  for (const col of preferredCols) {
-    if (!isColumnPlayable(col)) continue;
-
-    const tempBoard = copyBoard(board);
-    dropDiscToBoard(tempBoard, col, AI);
-    const score = minimax(tempBoard, difficulty === 'easy' ? 2 : difficulty === 'medium' ? 4 : 6, -Infinity, Infinity, false);
-    moves.push({ col, score });
-  }
-
-  if (moves.length === 0) {
-    return 3;
-  }
-
-  if (difficulty === 'easy') {
-    const randomChance = Math.random();
-    if (randomChance < 0.35) {
-      return moves[Math.floor(Math.random() * moves.length)].col;
-    }
-  }
-
-  moves.sort((a, b) => b.score - a.score);
-  return moves[0].col;
-}
-
-function makeAiMove() {
-  if (gameOver) return;
-
-  const aiCol = chooseAiColumn();
-  const move = dropDisc(aiCol, AI);
-  if (!move) return;
-
-  const winner = getWinner();
-  renderBoard();
-
-  if (winner === AI) {
-    endGame(winner);
-    return;
-  }
-
-  if (isBoardFull()) {
-    endGame(null);
-    return;
-  }
-
-  currentTurn = HUMAN;
-  updateStatus();
-  renderBoard();
-}
-
-newGameBtn.addEventListener('click', initializeBoard);
-
-difficultySelect.addEventListener('change', (event) => {
-  difficulty = event.target.value;
-  if (!gameOver && currentTurn === AI) {
-    setTimeout(() => makeAiMove(), 150);
-  }
-});
-
-initializeBoard();
+# Connect 4 vs AI
+
+一个可直接打开的网页版四子棋游戏。玩家执红棋，AI 执黄棋，支持 Easy、Medium、Hard 三种难度。
+
+## 项目文件
+
+```text
+connect-4/
+├── index.html    # 页面结构（开始界面 + 游戏界面）
+├── styles.css    # 页面与棋盘的视觉样式
+├── script.js     # 游戏规则、交互与 AI 搜索逻辑
+└── README.md
+```
+
+> 原项目中的 `README.md` 内容实际上是 JavaScript 代码，并且页面引用了不存在的 `script.js`，所以棋盘无法显示、New Game 也无法工作。本版本已将这些逻辑整理到正确的 `script.js` 中。
+
+## 如何运行
+
+最简单的方式：直接双击 `index.html`。
+
+如果浏览器限制本地文件，也可以在项目目录运行一个本地服务器：
+
+```bash
+python -m http.server 8000
+```
+
+然后打开 <http://localhost:8000>。
+
+## 玩法
+
+1. 在 Difficulty 下拉框中选择 `Easy`、`Medium` 或 `Hard`。
+2. 点击 **New Game**（或 **Start Playing**）进入棋盘。
+3. 点击任意一列，把红色棋子放入该列最底部的位置。
+4. 玩家与 AI 轮流落子。任意方向先连成四子的一方获胜。
+5. 游戏结束后，点击 **New Game** 立即开始下一局。
+
+## 三种 AI 难度
+
+| 难度 | AI 行为 |
+| --- | --- |
+| Easy | 大多随机落子，只偶尔抓住胜利或阻挡玩家，适合轻松练习。 |
+| Medium | 使用 3 层 Minimax 搜索；一定会抓住直接胜利，也会阻挡玩家的直接四连。 |
+| Hard | 使用 5 层 Minimax 搜索和 Alpha-Beta 剪枝，会规划多步攻势并更积极防守。 |
+
+## 已实现的功能
+
+- 可交互的 6 × 7 棋盘，按列落子，支持鼠标与键盘操作。
+- New Game 会从开始界面进入游戏，或在游戏中立即重置棋局。
+- 三种 AI 难度，切换后立即生效。
+- 胜负检测，获胜的四颗棋子会高亮显示。
+- 平局检测、AI 思考状态、重新开始时的计时器清理。
+- 响应式布局和键盘焦点样式。
+- 已移除原来的 Player / Draws / AI 记分方框及相关计分代码，界面更简洁。
+
+## 可调整的地方
+
+如果想调整 Hard 的强度，可修改 `script.js` 中：
+
+```js
+const searchDepth = difficulty === "hard" ? 5 : 3;
+```
+
+把 `5` 改大（例如 `6`）会让 AI 看得更远，但思考时间也会增加；改小则会降低难度。
