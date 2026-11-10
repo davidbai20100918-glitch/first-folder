@@ -162,6 +162,15 @@
       when.textContent = formatDate(row.created_at);
       meta.appendChild(when);
 
+      if (row.mine) {
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "comment-delete";
+        remove.textContent = "Delete";
+        remove.addEventListener("click", () => removeComment(row.id, remove));
+        meta.appendChild(remove);
+      }
+
       const text = document.createElement("p");
       text.className = "comment-body";
       text.textContent = row.body;
@@ -299,12 +308,47 @@
 
   async function loadComments() {
     try {
-      const response = await fetch(`${API_BASE}/comments`, { cache: "no-store" });
+      const headers = session
+        ? { Authorization: `Bearer ${session.token}` }
+        : undefined;
+      const response = await fetch(`${API_BASE}/comments`, {
+        cache: "no-store",
+        headers,
+      });
       if (!response.ok) throw new Error(String(response.status));
       const rows = await response.json();
       renderComments(Array.isArray(rows) ? rows : []);
     } catch {
       setStatus("Could not load comments right now.", true);
+    }
+  }
+
+  async function removeComment(id, button) {
+    if (!session) return;
+    if (!confirm("Delete this comment? This cannot be undone.")) return;
+
+    button.disabled = true;
+    try {
+      const response = await fetch(`${API_BASE}/comments/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${session.token}` },
+      });
+
+      if (response.status === 401) {
+        writeSession(null);
+        renderAuth();
+        setStatus("Your session expired. Please sign in again.", true);
+        return;
+      }
+      if (!response.ok) {
+        setStatus("Could not delete that comment.", true);
+        button.disabled = false;
+        return;
+      }
+      await loadComments();
+    } catch {
+      setStatus("Could not reach the comment server.", true);
+      button.disabled = false;
     }
   }
 
