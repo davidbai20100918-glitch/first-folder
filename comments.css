@@ -1,0 +1,214 @@
+/* ------------------------------------------------------------------ *
+ * Comment section
+ * Reuses the tokens defined in styles.css so it matches the game panel.
+ * ------------------------------------------------------------------ */
+
+.comments-panel {
+  margin-top: 18px;
+}
+
+.comments-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.comments-head h2 {
+  font-size: 1.35rem;
+}
+
+.comments-auth {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  flex: none;
+}
+
+.comments-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 6px 5px 7px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.45);
+}
+
+.comments-user .avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+}
+
+.comments-user .avatar--fallback {
+  display: grid;
+  place-items: center;
+  background: rgba(56, 189, 248, 0.18);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.comments-user .who-name {
+  max-width: 16ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.comments-signout {
+  padding: 0.42rem 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--label);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.comments-signout:hover {
+  border-color: rgba(125, 211, 252, 0.55);
+  color: var(--text);
+}
+
+#comment-form {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#comment-input {
+  width: 100%;
+  min-height: 92px;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 13px;
+  background: rgba(7, 16, 30, 0.82);
+  color: var(--text);
+  font: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+#comment-input::placeholder {
+  color: rgba(148, 163, 184, 0.7);
+}
+
+#comment-input:hover {
+  border-color: rgba(125, 211, 252, 0.45);
+}
+
+#comment-input:focus-visible {
+  outline: 3px solid rgba(125, 211, 252, 0.9);
+  outline-offset: 2px;
+}
+
+.comment-form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.comment-form-row .primary-btn {
+  padding: 0.72rem 1.1rem;
+}
+
+.comments-status {
+  margin: 0 0 10px;
+  min-height: 1.15rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.comments-status--error {
+  color: #fca5a5;
+}
+
+.comment-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.comment {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  background: rgba(2, 6, 23, 0.42);
+}
+
+.comment .avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment .avatar--fallback {
+  display: grid;
+  place-items: center;
+  background: rgba(56, 189, 248, 0.18);
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.comment-meta {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.comment-meta strong {
+  font-size: 0.86rem;
+}
+
+.comment-meta time {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.comment-body {
+  margin: 0;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.comments-empty {
+  margin: 0;
+  padding: 6px 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 640px) {
+  .comments-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .comments-user .who-name {
+    max-width: 11ch;
+  }
+}

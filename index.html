@@ -13,6 +13,7 @@
     />
     <title>Connect 4 vs AI</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="comments.css" />
   </head>
   <body>
     <main class="app">
@@ -109,8 +110,42 @@
           </p>
         </section>
       </section>
+
+      <!-- 评论区：需要 Google 登录。后端在 api/ 目录，部署步骤见 COMMENTS-SETUP.md -->
+      <section
+        id="comments"
+        class="panel comments-panel"
+        aria-labelledby="comments-title"
+      >
+        <div class="comments-head">
+          <div>
+            <p class="eyebrow eyebrow--accent">Community</p>
+            <h2 id="comments-title">Comments</h2>
+          </div>
+          <div class="comments-auth" data-auth></div>
+        </div>
+
+        <form id="comment-form" data-form hidden>
+          <label class="label" for="comment-input">Leave a comment</label>
+          <textarea
+            id="comment-input"
+            data-input
+            maxlength="1000"
+            required
+            placeholder="Beat the AI? Share a tip or how you cracked Hard mode."
+          ></textarea>
+          <div class="comment-form-row">
+            <span class="hint" data-count></span>
+            <button class="primary-btn" type="submit">Post comment</button>
+          </div>
+        </form>
+
+        <p class="comments-status" data-status role="status" aria-live="polite"></p>
+        <ul class="comment-list" data-list></ul>
+      </section>
     </main>
 
     <script src="script.js" defer></script>
+    <script src="comment-section.js" defer></script>
   </body>
 </html>
